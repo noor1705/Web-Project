@@ -15,10 +15,6 @@ const userSchema = new mongoose.Schema({
   isVerified: { type: Boolean, default: false },
   verificationToken: { type: String },
   createdAt: { type: Date, default: Date.now },
-  profilePic: { type: String }, // URL to Cloudinary or storage
-  interests: [String],
-  linkedin: { type: String },
-  github: { type: String },
 
 });
 

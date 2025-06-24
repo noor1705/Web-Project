@@ -177,7 +177,6 @@ router.post("/buy/:id", authenticate, async (req, res) => {
     });
     await buyerWallet.save();
 
-    // 💰 Credit seller
     sellerWallet.balance += doc.price;
     sellerWallet.transactions.push({
       type: "credit",
@@ -205,11 +204,10 @@ router.post("/buy/:id", authenticate, async (req, res) => {
     if (!doc.fileUrl)
       return res.status(500).json({ message: "No file URL available" });
 
-    // 🎉 Respond with file URL for frontend to download
     res.json({ fileUrl: doc.fileUrl });
 
   } catch (err) {
-    console.error("❌ Buy error:", err);
+    console.error(" Buy error:", err);
     res.status(500).json({ message: "Purchase failed" });
   }
 });
@@ -242,7 +240,7 @@ router.post("/download/:id", authenticate, async (req, res) => {
 
     res.json({ fileUrl: doc.fileUrl });
   } catch (err) {
-    console.error("❌ Free download error:", err.message);
+    console.error("Free download error:", err.message);
     res.status(500).json({ message: "Free download failed" });
   }
 });
@@ -267,4 +265,19 @@ router.get("/all", authenticate, async (req, res) => {
     res.status(500).json({ message: "Server error while fetching documents" });
   }
 });
+router.post("/upvote/:id", authenticate, async (req, res) => {
+  try {
+    const doc = await Document.findById(req.params.id);
+    if (!doc) return res.status(404).json({ message: "Document not found" });
+
+    doc.upvotes += 1;
+    await doc.save();
+
+    res.json({ message: "Upvote successful", upvotes: doc.upvotes });
+  } catch (err) {
+    console.error("Upvote error:", err.message);
+    res.status(500).json({ message: "Upvote failed" });
+  }
+});
+
 module.exports = router;

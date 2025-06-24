@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 // ✅ Correct path to the model
 const User = require("../models/User");
 const Wallet = require("../models/Wallet");
-const sendEmail = require("../utils/sendEmail"); // Will use this to send verification emails
+const sendEmail = require("./sendEmail"); // Will use this to send verification emails
 function extractUniversityFromEmail(email) {
   const domain = email.split("@")[1];
   if (!domain) return "";
@@ -27,7 +27,7 @@ router.post("/signup", async (req, res) => {
 
     const university = extractUniversityFromEmail(email); // auto-filled here
 
-    const hashedPassword = await bcrypt.hash(password, 10); // ← if not already handled
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const verificationToken = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
@@ -36,8 +36,6 @@ router.post("/signup", async (req, res) => {
       email,
       password: hashedPassword,
       university,
-      department,
-      program,
       verificationToken
     });
 
@@ -59,7 +57,7 @@ await newWallet.save();
      <a href="${verifyUrl}" style="padding: 10px 20px; background: #4caf50; color: white; text-decoration: none;">Verify Email</a>
      `);
 
-    console.log("✅ Verify URL:", verifyUrl);
+    console.log("Verify URL:", verifyUrl);
     res.status(201).json({ msg: "Signup successful. Please check your email to verify your account." });
 
   } catch (error) {
@@ -130,7 +128,7 @@ router.post("/login", async (req, res) => {
 
     // 5. Return token and user info
     res.json({
-      msg: "✅ Login successful.",
+      msg: "Login successful.",
       token,
       user: {
         id: user._id,
@@ -143,7 +141,7 @@ router.post("/login", async (req, res) => {
     });
   } catch (err) {
     console.error("Login error:", err.message);
-    res.status(500).json({ msg: "❌ Server error during login." });
+    res.status(500).json({ msg: "Server error during login." });
   }
 });
 //Resend Route
@@ -181,14 +179,14 @@ router.post("/resend-verification", async (req, res) => {
   }
 });
 
-// ✅ GET /api/auth/me
+// GET /api/auth/me
 router.get("/me", authenticate, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
     if (!user) return res.status(404).json({ msg: "User not found" });
     res.json(user);
   } catch (err) {
-    console.error("❌ /me error:", err);
+    console.error("/me error:", err);
     res.status(500).json({ msg: "Server error" });
   }
 });
